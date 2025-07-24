@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vudio Analytics Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            min-height: 100vh;
+            padding: 24px;
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .logo {
+            background: #16a34a;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            font-size: 32px;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-text h1 {
+            font-size: 36px;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .header-text p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+        
+        .green { color: #16a34a; }
+        .blue { color: #2563eb; }
+        .purple { color: #7c3aed; }
+        .yellow { color: #d97706; }
+        .red { color: #dc2626; }
+        .indigo { color: #4f46e5; }
+        
+        .nav {
+            display: flex;
+            gap: 4px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            width: fit-content;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+        
+        .nav-btn {
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-btn.active {
+            background: #16a34a;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-btn:hover:not(.active) {
+            background: #f3f4f6;
+        }
+        
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+        
+        .card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #111827;
+        }
+        
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        
+        .exec-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .exec-card .label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        
+        .exec-card .subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #16a34a;
+        }
+        
+        .podium-item {
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid;
+        }
+        
+        .podium-1 {
+            border-color: #fbbf24;
+            background: #fffbeb;
+        }
+        
+        .podium-2 {
+            border-color: #9ca3af;
+            background: #f9fafb;
+        }
+        
+        .podium-3 {
+            border-color: #fb923c;
+            background: #fff7ed;
+        }
+        
+        .podium-medal {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .podium-rate {
+            font-size: 20px;
+            font-weight: bold;
+            color: #16a34a;
+            margin-bottom: 8px;
+        }
+        
+        .podium-name {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+        
+        .podium-stats {
+            font-size: 12px;
+            color: #6b7280;
+            text-align: left;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .kpi-card {
+            text-align: center;
+            padding: 24px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #bbf7d0;
+        }
+        
+        .kpi-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #16a34a;
+            margin-bottom: 8px;
+        }
+        
+        .kpi-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        
+        .kpi-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .insight-card {
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid;
+            margin-bottom: 16px;
+        }
+        
+        .insight-success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        
+        .insight-warning {
+            background: #fef3c7;
+            border-color: #fde68a;
+        }
+        
+        .insight-danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+        
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .insight-desc {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .insight-detail {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .stats-bar { grid-template-columns: repeat(3, 1fr); }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-4, .grid-3 { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 640px) {
+            .stats-bar { grid-template-columns: 1fr; }
+            body { padding: 16px; }
+            .header h1 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎬</div>
+            <div class="header-text">
+                <h1>🎬 Vudio Analytics Dashboard</h1>
+                <p>Comprehensive performance analysis across 9 video marketing campaigns</p>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value green">9</div>
+                <div class="stat-label">Total Campaigns</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value blue">9,532</div>
+                <div class="stat-label">Total Contacts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value purple">2.69%</div>
+                <div class="stat-label">Reply Rate</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value yellow">$700K</div>
+                <div class="stat-label">Total Pipeline</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value red">173</div>
+                <div class="stat-label">Opportunities</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value indigo">$73.44</div>
+                <div class="stat-label">Revenue/Contact</div>
+            </div>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" onclick="showTab('overview')">📊 Overview</button>
+            <button class="nav-btn" onclick="showTab('performance')">🏆 Performance</button>
+            <button class="nav-btn" onclick="showTab('campaigns')">🎯 Campaign Types</button>
+            <button class="nav-btn" onclick="showTab('markets')">🌍 Markets</button>
+            <button class="nav-btn" onclick="showTab('insights')">💡 Insights</button>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <div class="card">
+                <h3>📈 Executive Summary</h3>
+                <div class="grid-4">
+                    <div class="exec-card">
+                        <div class="value green">5</div>
+                        <div class="label">Active Campaigns</div>
+                        <div class="subtitle">4 completed</div>
+                    </div>
+                    <div class="exec-card">
+                        <div class="value blue">2.69%</div>
+                        <div class="label">Overall Reply Rate</div>
+                        <div class="subtitle">Strong performance</div>
+                        <div class="trend">📈 +18% vs avg</div>
+                    </div>
+                    <div class="exec-card">
+                        <div class="value purple">1.81%</div>
+                        <div class="label">Conversion Rate</div>
+                        <div class="subtitle">Replies to opportunities</div>
+                    </div>
+                    <div class="exec-card">
+                        <div class="value yellow">3.43%</div>
+                        <div class="label">Best Campaign</div>
+                        <div class="subtitle">Fashion US/CA</div>
+                        <div class="trend">📈 +58% vs avg</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="performance" class="tab-content">
+            <div class="card">
+                <h3>🏆 Top 3 Performing Campaigns</h3>
+                <div class="grid-3">
+                    <div class="podium-item podium-1">
+                        <div class="podium-medal">🥇</div>
+                        <div class="podium-rate">3.43%</div>
+                        <div class="podium-name">Vudio.ai | Fashion US/CA</div>
+                        <div class="podium-stats">
+                            <div class="metric">
+                                <span>Contacts:</span>
+                                <span class="metric-value">671</span>
+                            </div>
+                            <div class="metric">
+                                <span>Replies:</span>
+                                <span class="metric-value">23</span>
+                            </div>
+                            <div class="metric">
+                                <span>Revenue:</span>
+                                <span class="metric-value">$64K</span>
+                            </div>
+                            <div class="metric">
+                                <span>Opportunities:</span>
+                                <span class="metric-value">15</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="podium-item podium-2">
+                        <div class="podium-medal">🥈</div>
+                        <div class="podium-rate">3.42%</div>
+                        <div class="podium-name">Vudio.ai | US Phase 2</div>
+                        <div class="podium-stats">
+                            <div class="metric">
+                                <span>Contacts:</span>
+                                <span class="metric-value">964</span>
+                            </div>
+                            <div class="metric">
+                                <span>Replies:</span>
+                                <span class="metric-value">33</span>
+                            </div>
+                            <div class="metric">
+                                <span>Revenue:</span>
+                                <span class="metric-value">$100K</span>
+                            </div>
+                            <div class="metric">
+                                <span>Opportunities:</span>
+                                <span class="metric-value">25</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="podium-item podium-3">
+                        <div class="podium-medal">🥉</div>
+                        <div class="podium-rate">3.41%</div>
+                        <div class="podium-name">Vudio.ai | Fashion UK</div>
+                        <div class="podium-stats">
+                            <div class="metric">
+                                <span>Contacts:</span>
+                                <span class="metric-value">1,174</span>
+                            </div>
+                            <div class="metric">
+                                <span>Replies:</span>
+                                <span class="metric-value">40</span>
+                            </div>
+                            <div class="metric">
+                                <span>Revenue:</span>
+                                <span class="metric-value">$112K</span>
+                            </div>
+                            <div class="metric">
+                                <span>Opportunities:</span>
+                                <span class="metric-value">28</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="campaigns" class="tab-content">
+            <div class="card">
+                <h3>🎯 Campaign Type Analysis</h3>
+                <div class="grid-3">
+                    <div style="padding: 20px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+                        <h4 style="color: #16a34a; margin-bottom: 12px;">🎨 Fashion Campaigns</h4>
+                        <div style="font-size: 24px; font-weight: bold; color: #16a34a; margin-bottom: 8px;">2.88%</div>
+                        <div style="font-size: 14px; color: #374151;">Average Reply Rate</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">5 campaigns, $368K revenue</div>
+                    </div>
+                    <div style="padding: 20px; background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px;">
+                        <h4 style="color: #2563eb; margin-bottom: 12px;">▶️ US Phase Campaigns</h4>
+                        <div style="font-size: 24px; font-weight: bold; color: #2563eb; margin-bottom: 8px;">3.14%</div>
+                        <div style="font-size: 14px; color: #374151;">Average Reply Rate</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">3 campaigns, $236K revenue</div>
+                    </div>
+                    <div style="padding: 20px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;">
+                        <h4 style="color: #d97706; margin-bottom: 12px;">🇦🇺 AUS Phase</h4>
+                        <div style="font-size: 24px; font-weight: bold; color: #d97706; margin-bottom: 8px;">2.72%</div>
+                        <div style="font-size: 14px; color: #374151;">Reply Rate</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">1 campaign, $96K revenue</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="markets" class="tab-content">
+            <div class="card">
+                <h3>🌍 Market Performance</h3>
+                <div class="grid-4">
+                    <div style="padding: 20px; background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #2563eb; margin-bottom: 8px;">3.14%</div>
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">🇺🇸 USA</div>
+                        <div style="font-size: 12px; color: #6b7280;">3 campaigns</div>
+                    </div>
+                    <div style="padding: 20px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #16a34a; margin-bottom: 8px;">2.54%</div>
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">🇦🇺 Australia</div>
+                        <div style="font-size: 12px; color: #6b7280;">3 campaigns</div>
+                    </div>
+                    <div style="padding: 20px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #d97706; margin-bottom: 8px;">2.40%</div>
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">🇬🇧 UK</div>
+                        <div style="font-size: 12px; color: #6b7280;">2 campaigns</div>
+                    </div>
+                    <div style="padding: 20px; background: #faf5ff; border: 1px solid #c4b5fd; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #7c3aed; margin-bottom: 8px;">3.43%</div>
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">🇺🇸🇨🇦 US/CA</div>
+                        <div style="font-size: 12px; color: #6b7280;">1 campaign</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="insights" class="tab-content">
+            <div class="card">
+                <h3>📊 Key Performance Insights</h3>
+                <div class="grid-4">
+                    <div class="kpi-card">
+                        <div class="kpi-value">3.43%</div>
+                        <div class="kpi-label">Peak Performance</div>
+                        <div class="kpi-desc">Fashion US/CA</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">3.14%</div>
+                        <div class="kpi-label">USA Avg Rate</div>
+                        <div class="kpi-desc">3 phase campaigns</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">2.88%</div>
+                        <div class="kpi-label">Fashion Avg Rate</div>
+                        <div class="kpi-desc">5 campaigns</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">$73.44</div>
+                        <div class="kpi-label">Revenue per Contact</div>
+                        <div class="kpi-desc">Overall average</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                <div class="card">
+                    <h3>🎯 Success Drivers</h3>
+                    <div class="insight-card insight-success">
+                        <div class="insight-title" style="color: #166534;">Fashion Vertical Excellence</div>
+                        <div class="insight-desc" style="color: #15803d;">2.88% avg rate across 5 campaigns, $368K revenue</div>
+                        <div class="insight-detail" style="color: #16a34a;">Direct targeting performs 81% better than public</div>
+                    </div>
+                    <div class="insight-card insight-success">
+                        <div class="insight-title" style="color: #1e40af;">USA Market Mastery</div>
+                        <div class="insight-desc" style="color: #2563eb;">Consistent 3%+ performance across all phases</div>
+                        <div class="insight-detail" style="color: #3b82f6;">Proven scalability with phase progression</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>⚠️ Growth Opportunities</h3>
+                    <div class="insight-card insight-danger">
+                        <div class="insight-title" style="color: #991b1b;">Public Email Optimization</div>
+                        <div class="insight-desc" style="color: #dc2626;">1.87% avg rate vs 3.14% for direct targeting</div>
+                        <div class="insight-detail" style="color: #ef4444;">Review targeting criteria and messaging</div>
+                    </div>
+                    <div class="insight-card insight-warning">
+                        <div class="insight-title" style="color: #92400e;">Scale Successful Models</div>
+                        <div class="insight-desc" style="color: #d97706;">US/CA approach not replicated elsewhere</div>
+                        <div class="insight-detail" style="color: #f59e0b;">Test successful approaches in new markets</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📈 Growth Projections & ROI Analysis</h3>
+                <div class="grid-4">
+                    <div style="text-align: center; padding: 16px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 20px; font-weight: bold; color: #16a34a; margin-bottom: 4px;">$700K</div>
+                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 2px;">Current Pipeline</div>
+                        <div style="font-size: 12px; color: #9ca3af;">9 campaigns total</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 20px; font-weight: bold; color: #2563eb; margin-bottom: 4px;">$1.2M</div>
+                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 2px;">12-Month Projection</div>
+                        <div style="font-size: 12px; color: #9ca3af;">With optimizations</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 20px; font-weight: bold; color: #7c3aed; margin-bottom: 4px;">3.2%</div>
+                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 2px;">Target Reply Rate</div>
+                        <div style="font-size: 12px; color: #9ca3af;">19% improvement</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 20px; font-weight: bold; color: #d97706; margin-bottom: 4px;">71%</div>
+                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 2px;">Projected Growth</div>
+                        <div style="font-size: 12px; color: #9ca3af;">Revenue increase</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
